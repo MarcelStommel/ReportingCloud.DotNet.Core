@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp1.1</TargetFramework>
+    <TargetFrameworks>netstandard1.3;net45;;netcoreapp11</TargetFrameworks>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <PackageId>TXTextControl.ReportingCloud.Core</PackageId>
     <Version>1.105.500</Version>
@@ -17,6 +17,7 @@
     <PackageTags>MailMerge, Reporting, MS Word, Reporting Cloud, Flow Type Layout</PackageTags>
     <FileVersion>1.0.105.100</FileVersion>
     <AssemblyVersion>1.0.105.100</AssemblyVersion>
+    <RootNamespace>TXTextControl.ReportingCloud</RootNamespace>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -25,6 +26,10 @@
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)'=='net45'">
+    <Reference Include="System.Net.Http" />
   </ItemGroup>
 
 </Project>

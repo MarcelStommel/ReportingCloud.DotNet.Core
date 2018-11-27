@@ -246,6 +246,48 @@ namespace TXTextControl.ReportingCloud
         /// <param name="fromPage">The first page of the template that should be created as thumbnails.</param>
         /// <param name="toPage">The last page of the template that should be created as thumbnails.</param>
         /// <param name="imageFormat">The image format of the returned thumbnail images.</param>
+#if NET45
+        public List<System.Drawing.Image> GetTemplateThumbnails(string templateName, int zoomFactor,
+            int fromPage = 1, int toPage = 0, ImageFormat imageFormat = ImageFormat.PNG)
+        {
+            // create a new list of System.Drawing.Image
+            List<System.Drawing.Image> lImageThumbnails = new List<System.Drawing.Image>();
+
+            // create a new HttpClient using the Factory method CreateHttpClient
+            using (HttpClient client = CreateHttpClient())
+            {
+                // set the endpoint and pass the query paramaters
+                HttpResponseMessage response =
+                    client.GetAsync("v1/templates/thumbnails?templateName=" + templateName +
+                                    "&zoomFactor=" + zoomFactor +
+                                    "&fromPage=" + fromPage.ToString() +
+                                    "&toPage=" + toPage.ToString() +
+                                    "&imageFormat=" + imageFormat.ToString()).Result;
+
+                // if sucessful, return the image list
+                if (response.IsSuccessStatusCode)
+                {
+                    List<string> results = (List<string>)JsonConvert.DeserializeObject(response.Content.ReadAsStringAsync().Result, typeof(List<string>));
+
+                    // create images from the Base64 encoded images
+                    foreach (string thumbnail in results)
+                    {
+                        using (var ms = new MemoryStream(System.Convert.FromBase64String(thumbnail)))
+                        {
+                            lImageThumbnails.Add(System.Drawing.Image.FromStream(ms));
+                        }
+                    }
+
+                    return lImageThumbnails;
+                }
+                else
+                {
+                    // throw exception with the message from the endpoint
+                    throw new ArgumentException(response.Content.ReadAsStringAsync().Result);
+                }
+            }
+        }
+#else
         public List<string> GetTemplateThumbnails(string templateName, int zoomFactor,
         int fromPage = 1, int toPage = 0, ImageFormat imageFormat = ImageFormat.PNG)
         {
@@ -272,6 +314,7 @@ namespace TXTextControl.ReportingCloud
                 }
             }
         }
+#endif
 
         /*-------------------------------------------------------------------------------------------------------
         // ** ShareDocument **
